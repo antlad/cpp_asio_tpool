@@ -19,8 +19,8 @@
 
 namespace atpool {
 
-typedef boost::asio::yield_context asio_ctx;
-typedef boost::asio::io_service asio_io;
+typedef boost::asio::yield_context ctx;
+typedef boost::asio::io_service io;
 
 class base_task {
 public:
@@ -87,7 +87,7 @@ class task:
 	public base_task {
 public:
 
-	task(asio_io& io,
+	task(io& io,
 		 Functor&& func,
 		 Args&& ... args
 		)
@@ -119,7 +119,7 @@ public:
 		return m_done.load(std::memory_order_release);
 	}
 
-	T result(asio_ctx ctx)
+	T result(ctx ctx)
 	{
 		if (m_done.load(std::memory_order_release))
 		{
@@ -143,7 +143,7 @@ public:
 	}
 
 private:
-	asio_io& m_io;
+	io& m_io;
 	T m_result;
 	std::atomic<bool> m_done;
 	std::exception_ptr m_exptr;
@@ -154,7 +154,7 @@ private:
 
 class thread_pool {
 public:
-	thread_pool(asio_io& io,
+	thread_pool(io& io,
 				std::size_t thread_count = std::thread::hardware_concurrency(),
 				int inactive_time_sleep_microsecs = 50000)
 		: m_io(io)
@@ -235,7 +235,7 @@ public:
 	}
 
 private:
-	asio_io& m_io;
+	io& m_io;
 	std::atomic<bool> m_stop;
 	int m_inactive_time_sleep_microsecs;
 
